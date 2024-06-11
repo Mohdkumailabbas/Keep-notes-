@@ -15,10 +15,31 @@ app.get("/",(req,res)=>{
    
 })
 app.post("/create",(req,res)=>{
-    const fileName = req.body.title.split(' ').join('') + '.txt';
-    fs.writeFile(`./files/${fileName}`, req.body.details, function (err) {});
-    res.redirect("/")//kam honeke baad slash pr redirect krdo
+    if (req.body.title) {
+        const fileName = req.body.title.split(' ').join('') + '.txt';
+        fs.writeFile(`./files/${fileName}`, req.body.details, function (err) {});
+    }
+    res.redirect("/");
 })
+app.get("/file/:filename",(req,res)=>{
+    const filepath= `./files/${req.params.filename}`;
+    fs.readFile(filepath,"utf-8",(err,filedata)=>{
+        console.log(filedata)
+        res.render('show',{filename:req.params.filename, filedata:filedata});
+    })
+})
+
+
+app.get("/edit/:filename",(req,res)=>{
+    res.render('edit',{filename:req.params.filename})
+})
+app.post("/edit",(req,res)=>{
+    fs.rename(`./files/${req.body.previous}`, `./files/${req.body.new}`, function (err) {
+     
+       res.redirect("/")
+     })
+})
+
 app.listen(3000,() => {
     console.log("Server is running on port 3000");
 });
